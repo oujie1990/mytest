@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<antlib>
+  <!-- Tasks -->
+  <taskdef name="exportIncrement"
+    classname="com.hztech.autofetch.ExportIncrementFilesTask" />
+</antlib>

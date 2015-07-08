@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!-- Sample build file used to retrieve svnant's sources -->
+<project default="export" basedir=".">
+	<property file="hyt2pf_build.properties"/> 
+    
+    <property name="svn.url" value="${svn._url}"/>
+    <property name="svn.username" value="${svn.username}"/>
+    <property name="svn.password" value="${svn.password}"/>
+	
+	<path id="svnant.classpath">
+        <fileset dir="${basedir}">
+            <include name="lib/svn/*.jar"/>
+        	<include name="lib/**.jar"/>
+        </fileset>
+    </path>
+	
+	<taskdef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath"/>
+	<taskdef resource="com/hztech/autofetch/exportantlib.xml" classpathref="svnant.classpath"/>
+	
+	<svnSetting id="svn.setting" username="${svn.username}" password="${svn.password}"  javahl="false" svnkit="true" />
+	
+	<target name="init" description="init clean dirs">
+			<echo message="${svn.url}"/>
+	        <echo message="Revision : ${oldRevision} TO ${newRevision}"/>
+	        <echo message="TO : ${increment.path}"/>
+	        <delete dir="${increment.path}" failonerror="false" deleteonexit="true"/>
+	        <delete dir="${increment.file}" failonerror="false" deleteonexit="true"/>
+    </target>
+	<target name="tool-available" depends="init">
+	        <echo message="run task test svnant is available"></echo>
+	        <available resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" property="available.svnant"/>
+	        <echo message="SVN-ANT is available = ${available.svnant}"></echo>
+    </target>
+	<target name="package" depends="tool-available" description="Package Incremental">
+		<svn refid="svn.setting">
+			<!-- 汇总所有提交信息 -->
+            <diffSummarize oldUrl="${svn.url}" oldTargetRevision="${oldRevision}" newUrl="${svn.url}" newTargetRevision="${newRevision}" outFile="${increment.file}" recurse="true"/>
+        </svn>
+	</target>
+	<target name="export" depends="package">
+		<exportIncrement targetDir="${project.path}" incrementDir="${increment.path}" targetFile="${increment.file}" excludeDir=""/>
+	</target>
+</project>
